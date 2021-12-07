@@ -40,6 +40,7 @@ class TableViewController: UITableViewController {
         
         do {
             try context.save()
+            tasks.append(taskObject)
         } catch let error as NSError {
             print (error.localizedDescription)
         }
@@ -52,6 +53,8 @@ class TableViewController: UITableViewController {
         super.viewWillAppear(animated)
         let context = getContext()
         let fetchRequest: NSFetchRequest<Task> = Task.fetchRequest()
+        let sortDescriptor = NSSortDescriptor(key: "title", ascending: false)
+        fetchRequest.sortDescriptors = [sortDescriptor]
         
         do {
             tasks = try context.fetch(fetchRequest)
@@ -61,6 +64,21 @@ class TableViewController: UITableViewController {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let context = getContext()
+        let fetchRequest: NSFetchRequest<Task> = Task.fetchRequest()
+        
+        if let result = try? context.fetch(fetchRequest) {
+            for object in result {
+                context.delete(object)
+            }
+        }
+        
+        do {
+            try context.save()
+        } catch let error as NSError {
+            print (error.localizedDescription)
+        }
 
     }
 
@@ -83,15 +101,4 @@ class TableViewController: UITableViewController {
 
         return cell
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
